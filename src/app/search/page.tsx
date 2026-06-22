@@ -28,6 +28,7 @@ export default function SearchPage() {
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [saving, setSaving] = useState<string | null>(null);
+  const [saved, setSaved] = useState<Set<string>>(new Set());
 
   async function handleSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -55,7 +56,7 @@ export default function SearchPage() {
     setSaving(org.name);
     try {
       const rawData = org.rawData || {};
-      await fetch("/api/organizations", {
+      const res = await fetch("/api/organizations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -67,6 +68,9 @@ export default function SearchPage() {
           sourceUrls: rawData.sourceUrl ? [rawData.sourceUrl] : [],
         }),
       });
+      if (res.ok) {
+        setSaved((prev) => new Set(prev).add(org.name));
+      }
     } finally {
       setSaving(null);
     }
@@ -151,13 +155,19 @@ export default function SearchPage() {
                       </p>
                     )}
                   </div>
-                  <button
-                    onClick={() => saveOrganization(org)}
-                    disabled={saving === org.name}
-                    className="shrink-0 px-3 py-1.5 text-sm rounded-md border border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary)] hover:text-white disabled:opacity-50 transition-colors"
-                  >
-                    {saving === org.name ? "Saving..." : "Save"}
-                  </button>
+                  {saved.has(org.name) ? (
+                    <span className="shrink-0 px-3 py-1.5 text-sm rounded-md bg-[var(--success)] text-white">
+                      Saved
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => saveOrganization(org)}
+                      disabled={saving === org.name}
+                      className="shrink-0 px-3 py-1.5 text-sm rounded-md border border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary)] hover:text-white disabled:opacity-50 transition-colors"
+                    >
+                      {saving === org.name ? "Saving..." : "Save"}
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
