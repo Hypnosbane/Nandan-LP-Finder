@@ -2,11 +2,12 @@ import type { ContactProvider } from "./types";
 import { ApolloProvider } from "./apollo/client";
 import { RocketReachProvider } from "./rocketreach/client";
 import { SebiAifProvider } from "./sebi/client";
+import { IndiaFamilyOfficeProvider } from "./india-fo/client";
 import { MockProvider } from "./mock/client";
 
 export type { ContactProvider, OrganizationSearchResult, ContactSearchResult, ContactEnrichmentResult } from "./types";
 
-export function createProvider(name: "apollo" | "rocketreach" | "sebi_aif" | "mock"): ContactProvider {
+export function createProvider(name: "apollo" | "rocketreach" | "sebi_aif" | "india_family_offices" | "mock"): ContactProvider {
   switch (name) {
     case "apollo": {
       const key = process.env.APOLLO_API_KEY;
@@ -20,6 +21,8 @@ export function createProvider(name: "apollo" | "rocketreach" | "sebi_aif" | "mo
     }
     case "sebi_aif":
       return new SebiAifProvider();
+    case "india_family_offices":
+      return new IndiaFamilyOfficeProvider();
     case "mock":
       return new MockProvider();
   }
@@ -27,10 +30,13 @@ export function createProvider(name: "apollo" | "rocketreach" | "sebi_aif" | "mo
 
 export function getProviders(): ContactProvider[] {
   const mode = process.env.PROVIDER_MODE || "mock";
+  const providers: ContactProvider[] = [
+    new SebiAifProvider(),
+    new IndiaFamilyOfficeProvider(),
+  ];
   if (mode === "mock") {
-    return [new SebiAifProvider(), new MockProvider()];
+    return providers;
   }
-  const providers: ContactProvider[] = [new SebiAifProvider()];
   if (process.env.APOLLO_API_KEY) {
     providers.push(new ApolloProvider(process.env.APOLLO_API_KEY));
   }
