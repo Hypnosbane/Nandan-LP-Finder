@@ -23,6 +23,14 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
+  const existing = await prisma.organization.findFirst({
+    where: { name: body.name },
+  });
+
+  if (existing) {
+    return NextResponse.json(existing, { status: 200 });
+  }
+
   const organization = await prisma.organization.create({
     data: {
       name: body.name,

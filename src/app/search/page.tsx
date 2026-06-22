@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface OrgResult {
   name: string;
@@ -29,6 +29,17 @@ export default function SearchPage() {
   const [searched, setSearched] = useState(false);
   const [saving, setSaving] = useState<string | null>(null);
   const [saved, setSaved] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    fetch("/api/organizations")
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setSaved(new Set(data.map((o: { name: string }) => o.name)));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   async function handleSearch(e: React.FormEvent) {
     e.preventDefault();

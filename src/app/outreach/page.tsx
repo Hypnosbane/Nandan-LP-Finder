@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
 interface GeneratedEmail {
@@ -21,6 +21,14 @@ const TYPE_MAP: Record<string, string> = {
 };
 
 export default function OutreachPage() {
+  return (
+    <Suspense fallback={<div className="max-w-7xl mx-auto px-4 py-8 text-[var(--muted)]">Loading...</div>}>
+      <OutreachContent />
+    </Suspense>
+  );
+}
+
+function OutreachContent() {
   const searchParams = useSearchParams();
 
   const [form, setForm] = useState({
