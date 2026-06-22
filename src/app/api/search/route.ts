@@ -6,7 +6,9 @@ import type { OrganizationSearchResult, ContactSearchResult } from "@/lib/provid
 const STOP_WORDS = new Set([
   "based", "in", "from", "at", "the", "a", "an", "and", "or", "of",
   "with", "for", "near", "around", "located", "operating", "who",
-  "that", "are", "is", "have", "has",
+  "that", "are", "is", "have", "has", "fund", "funds", "company",
+  "companies", "firm", "firms", "manager", "managers", "investor",
+  "investors", "capital", "group", "limited", "pvt", "ltd",
 ]);
 
 function parseQuery(raw: string): string[] {
