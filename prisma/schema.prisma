@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Organization {
+  id               String   @id @default(cuid())
+  name             String
+  type             String
+  website          String?
+  aum              Float?
+  country          String?
+  investmentFocus  String[] @default([])
+  alternativeAllocation Float?
+  privateCreditExposure Float?
+  score            Int?     @default(0)
+  sourceUrls       String[] @default([])
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  contacts      Contact[]
+  researchNotes ResearchNote[]
+
+  @@map("organizations")
+}
+
+model Contact {
+  id              String   @id @default(cuid())
+  organizationId  String
+  name            String
+  title           String?
+  email           String?
+  emailConfidence Int?     @default(0)
+  linkedinUrl     String?
+  source          String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  organization Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  campaigns    OutreachCampaign[]
+
+  @@map("contacts")
+}
+
+model ResearchNote {
+  id                String   @id @default(cuid())
+  organizationId    String
+  summary           String
+  investmentHistory String?
+  fundPreferences   String?
+  sources           String[] @default([])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@map("research_notes")
+}
+
+model OutreachCampaign {
+  id           String    @id @default(cuid())
+  contactId    String
+  emailSubject String
+  emailBody    String
+  status       String    @default("draft")
+  sentAt       DateTime?
+  replyStatus  String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  contact Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@map("outreach_campaigns")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  entity    String
+  entityId  String?
+  details   String?
+  createdAt DateTime @default(now())
+
+  @@map("audit_logs")
+}
