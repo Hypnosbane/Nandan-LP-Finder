@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 
 interface GeneratedEmail {
   subject: string;
@@ -8,7 +9,20 @@ interface GeneratedEmail {
   variant: string;
 }
 
+const TYPE_MAP: Record<string, string> = {
+  family_office: "family_office",
+  aif: "aif",
+  insurance: "insurance",
+  pension_fund: "pension_fund",
+  fund_of_funds: "fund_of_funds",
+  dfi: "dfi",
+  pms: "pms",
+  nbfc: "nbfc",
+};
+
 export default function OutreachPage() {
+  const searchParams = useSearchParams();
+
   const [form, setForm] = useState({
     organizationName: "",
     contactName: "",
@@ -19,6 +33,18 @@ export default function OutreachPage() {
     personalizationNotes: "",
     variant: "standard" as "short" | "standard" | "executive",
   });
+
+  useEffect(() => {
+    const org = searchParams.get("org");
+    const type = searchParams.get("type");
+    if (org || type) {
+      setForm((prev) => ({
+        ...prev,
+        ...(org ? { organizationName: org } : {}),
+        ...(type && TYPE_MAP[type] ? { investorType: TYPE_MAP[type] } : {}),
+      }));
+    }
+  }, [searchParams]);
   const [email, setEmail] = useState<GeneratedEmail | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

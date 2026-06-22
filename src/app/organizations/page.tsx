@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 interface Organization {
   id: string;
@@ -75,6 +76,7 @@ export default function OrganizationsPage() {
                 <th className="text-left py-3 px-4 font-medium text-[var(--muted)]">Focus</th>
                 <th className="text-left py-3 px-4 font-medium text-[var(--muted)]">Outreach</th>
                 <th className="text-left py-3 px-4 font-medium text-[var(--muted)]">Added</th>
+                <th className="text-left py-3 px-4 font-medium text-[var(--muted)]"></th>
               </tr>
             </thead>
             <tbody>
@@ -109,6 +111,14 @@ export default function OrganizationsPage() {
                   </td>
                   <td className="py-3 px-4 text-[var(--muted)]">
                     {new Date(org.createdAt).toLocaleDateString("en-IN")}
+                  </td>
+                  <td className="py-3 px-4">
+                    <Link
+                      href={`/outreach?org=${encodeURIComponent(org.name)}&type=${encodeURIComponent(org.type)}`}
+                      className="px-3 py-1.5 text-xs font-medium rounded-md border border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary)] hover:text-white transition-colors"
+                    >
+                      Draft email
+                    </Link>
                   </td>
                 </tr>
               ))}
