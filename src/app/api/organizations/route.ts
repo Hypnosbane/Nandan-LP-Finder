@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
 
   const organizations = await prisma.organization.findMany({
     where,
-    include: { contacts: true },
+    include: { contacts: { include: { campaigns: true } } },
     orderBy: { score: "desc" },
   });
 

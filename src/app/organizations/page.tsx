@@ -11,7 +11,7 @@ interface Organization {
   country: string | null;
   investmentFocus: string[];
   score: number | null;
-  contacts: { id: string; name: string; title: string | null; email: string | null }[];
+  contacts: { id: string; name: string; title: string | null; email: string | null; campaigns: { id: string; status: string; replyStatus: string | null }[] }[];
   createdAt: string;
 }
 
@@ -73,6 +73,7 @@ export default function OrganizationsPage() {
                 <th className="text-left py-3 px-4 font-medium text-[var(--muted)]">Score</th>
                 <th className="text-left py-3 px-4 font-medium text-[var(--muted)]">Contacts</th>
                 <th className="text-left py-3 px-4 font-medium text-[var(--muted)]">Focus</th>
+                <th className="text-left py-3 px-4 font-medium text-[var(--muted)]">Outreach</th>
                 <th className="text-left py-3 px-4 font-medium text-[var(--muted)]">Added</th>
               </tr>
             </thead>
@@ -102,6 +103,9 @@ export default function OrganizationsPage() {
                         </span>
                       ))}
                     </div>
+                  </td>
+                  <td className="py-3 px-4">
+                    <OutreachStatus contacts={org.contacts} />
                   </td>
                   <td className="py-3 px-4 text-[var(--muted)]">
                     {new Date(org.createdAt).toLocaleDateString("en-IN")}
@@ -142,4 +146,48 @@ function ScoreBadge({ score }: { score: number }) {
         ? "text-[var(--warning)]"
         : "text-[var(--muted)]";
   return <span className={`font-mono font-medium ${color}`}>{score}</span>;
+}
+
+function OutreachStatus({ contacts }: { contacts: Organization["contacts"] }) {
+  const allCampaigns = contacts.flatMap((c) => c.campaigns);
+
+  if (allCampaigns.length === 0) {
+    return (
+      <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+        Not contacted
+      </span>
+    );
+  }
+
+  const hasReply = allCampaigns.some((c) => c.replyStatus === "replied" || c.replyStatus === "meeting_booked");
+  const hasSent = allCampaigns.some((c) => c.status === "sent");
+  const hasDraft = allCampaigns.some((c) => c.status === "draft");
+
+  if (hasReply) {
+    return (
+      <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300">
+        Replied
+      </span>
+    );
+  }
+  if (hasSent) {
+    return (
+      <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+        Emailed
+      </span>
+    );
+  }
+  if (hasDraft) {
+    return (
+      <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+        Draft ready
+      </span>
+    );
+  }
+
+  return (
+    <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+      Not contacted
+    </span>
+  );
 }
